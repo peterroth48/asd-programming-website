@@ -58,10 +58,21 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
 ## Code structure
 - Plain HTML/CSS/JS, no build step. Hosted as a static site (GitHub Pages planned; confirm
   the school network allows it).
-- `programs/<program-id>/index.html`: one folder per program.
-- Planned: shared engine (setup screen, praise/correction, staff panel, audio), home screen,
-  playlist menu, playlist builder, and the Apps Script storage. Each program declares its
-  settings and category once; setup, builder and menu summaries are generated from that.
+- `index.html`: the whole site as one page (home, playlist menus, Get ready, setup, activity,
+  staff panel, end screen, builder), so the passcode and score stay in page memory.
+  URLs: `?p=B7` opens a playlist (home-screen shortcuts, QR cards), `?build` / `?build=B7`
+  opens the builder, `?try=<program-id>` previews one program with default settings.
+- `shared/`: `engine.js` (program registry, settings → setup/builder/summary, speech, chime,
+  press-and-hold), `store.js` (playlist store client), `app.js` (screens), `qr.js` (QR maker),
+  `shell.css`, `config.js` (Apps Script URL; empty = demo mode with sample playlists B7/R4,
+  passcode "demo", kept in page memory only).
+- `programs/<program-id>/program.js`: one per program. Calls `ASD.registerProgram({ id, name,
+  category, goal, icon, settings, run })`. `settings` uses `ASD.std.*` for the shared ones.
+  `run(ctx)` draws into `ctx.stage` and uses `ctx.record(correct)` (first response only),
+  `ctx.progress(i, n)`, `ctx.say`, `ctx.chime`, `ctx.later` (timers the shell can cancel),
+  `ctx.finish()`. Add each new program's script tag to `index.html`.
+  `programs/<program-id>/index.html` just opens the program in the shell (`?try=`).
+- `apps-script/`: `Code.gs` (Sheet-backed store) and `SETUP.md` (deploy steps).
 
 ## Shared program conventions (from Color ID)
 - Staff setup screen: version (receptive/expressive), step, session (teaching/baseline),
