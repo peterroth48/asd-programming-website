@@ -28,7 +28,7 @@
     try { history.replaceState(null, "", location.pathname + (q || "")); } catch (e) {}
   }
   function demoBanner() {
-    return store.demo ? '<div class="demo-banner">Demo mode: sample playlists B7 and R4, passcode "demo". Changes last until the page reloads.</div>' : "";
+    return store.demo ? '<div class="demo-banner">Demo mode: sample playlists B7 and R4 (plus A1, every program), passcode "demo". Changes last until the page reloads.</div>' : "";
   }
   function legend() {
     return '<div class="legend">' + Object.keys(ASD.CATEGORIES).map(function (k) {
@@ -244,13 +244,15 @@
 
   /* ----- Staff picks: list of program cards with a settings summary ----- */
   function staffMenu() {
-    var n = current.items.length;
+    var n = current.items.length, builtIn = !!current.playlist.builtIn;
     var s = el('<section class="screen scroll"><div class="page">' +
       '<div class="head"><div><h1 style="font-size:40px;line-height:46px">' + esc(current.playlist.code) + "</h1>" +
-      '<p class="sub">Staff picks · ' + n + " program" + (n === 1 ? "" : "s") + " · tap one to check its settings</p></div>" +
+      '<p class="sub">' + (builtIn ? "Every program on the site" : "Staff picks") + " · " + n + " program" + (n === 1 ? "" : "s") + " · tap one to check its settings</p></div>" +
       '<div style="display:flex;flex-direction:column;align-items:flex-end"><button type="button" class="link" data-a="home">Change playlist</button>' +
-      '<button type="button" class="link" data-a="edit">Edit this playlist</button></div></div>' +
-      demoBanner() + legend() + '<div class="list" style="display:flex;flex-direction:column;gap:14px"></div>' +
+      (builtIn ? "" : '<button type="button" class="link" data-a="edit">Edit this playlist</button>') + "</div></div>" +
+      demoBanner() +
+      (builtIn ? '<p class="note" style="text-align:left;margin:0 0 12px">' + esc(current.playlist.code) + " always holds every program, starting at its default settings. New programs join it on their own. Setting changes are just for today.</p>" : "") +
+      legend() + '<div class="list" style="display:flex;flex-direction:column;gap:14px"></div>' +
       (current.missing ? '<p class="note">' + current.missing + " program(s) in this playlist aren't on this site any more and are hidden.</p>" : "") +
       (n ? "" : '<p class="sub">This playlist has no programs yet.</p>') +
       "</div></section>");
@@ -261,7 +263,7 @@
       list.appendChild(c);
     });
     s.querySelector('[data-a="home"]').onclick = home;
-    s.querySelector('[data-a="edit"]').onclick = function () { builderOpen(current.playlist.code); };
+    if (!builtIn) s.querySelector('[data-a="edit"]').onclick = function () { builderOpen(current.playlist.code); };
     show(s);
   }
 
@@ -281,15 +283,16 @@
   function setup(it) {
     var saved = it.settings;
     var work = JSON.parse(JSON.stringify(saved));
-    var today = false;
+    var builtIn = !!current.playlist.builtIn;
+    var today = builtIn;   // A1 is never saved, so changes are always just for today
     var code = current.playlist.code;
     var s = el('<section class="screen scroll"><div class="page">' +
       '<div class="head"><div><h1>' + esc(it.prog.name) + '</h1><p class="sub">Settings from ' + esc(code) + ". Change anything before you start.</p></div>" +
       '<button type="button" class="link" data-a="back">Back to ' + esc(code) + "</button></div>" +
       '<p class="sub" style="margin-top:-8px">' + esc(it.prog.goal || "") + "</p>" +
       '<div class="settings"></div>' +
-      '<div class="group"><div class="row"><div>Just for today<span class="hint">On: changes are not saved to ' + esc(code) + '</span></div>' +
-      '<button type="button" class="toggle" role="switch" aria-label="Just for today" aria-checked="false"></button></div></div>' +
+      (builtIn ? "" : '<div class="group"><div class="row"><div>Just for today<span class="hint">On: changes are not saved to ' + esc(code) + '</span></div>' +
+      '<button type="button" class="toggle" role="switch" aria-label="Just for today" aria-checked="false"></button></div></div>') +
       '<button type="button" class="btn primary wide big-start">Start</button>' +
       '<p class="note save-note"></p>' +
       '<div class="msg err" hidden></div>' +
@@ -299,12 +302,13 @@
     function changed() { return !ASD.sameSettings(work, saved); }
     function paintNote() {
       err.hidden = true;
-      if (!changed()) noteEl.textContent = "No changes. " + code + " stays as it is.";
+      if (builtIn) noteEl.textContent = changed() ? "Just for today. " + code + " always starts at the default settings." : "Default settings.";
+      else if (!changed()) noteEl.textContent = "No changes. " + code + " stays as it is.";
       else if (today) noteEl.textContent = "Just for today. " + code + " keeps its saved settings.";
       else noteEl.textContent = "Start saves these settings to " + code + (store.hasPasscode() ? "." : " (asks for the staff passcode once).");
     }
     ASD.renderSettings(s.querySelector(".settings"), it.prog, work, paintNote);
-    todayBtn.onclick = function () {
+    if (todayBtn) todayBtn.onclick = function () {
       today = !today;
       todayBtn.classList.toggle("sel", today);
       todayBtn.setAttribute("aria-checked", today ? "true" : "false");
@@ -442,7 +446,7 @@
       if (opt.item && current.playlist.picks !== "staff") html += '<button type="button" class="btn wide" data-a="settings">Check settings</button>';
       if (opt.running || opt.item) html += '<button type="button" class="btn wide" data-a="menu">' + esc(backToMenuLabel()) + "</button>";
       html += '<div class="spacer"></div>' +
-        '<button type="button" class="link" data-a="edit" style="text-align:center">Edit this playlist (' + esc(code) + ")</button>" +
+        (current.playlist.builtIn ? "" : '<button type="button" class="link" data-a="edit" style="text-align:center">Edit this playlist (' + esc(code) + ")</button>") +
         '<button type="button" class="link" data-a="home" style="text-align:center">Open a different playlist</button>';
     }
     html += "</div>";
@@ -502,6 +506,21 @@
     };
     show(s);
   }
+  // A1 isn't stored, so there's nothing to edit.
+  function builtInNote(code, from) {
+    setUrl("?build=" + encodeURIComponent(code));
+    var s = el('<section class="screen scroll"><div class="page">' +
+      '<div class="head"><div><h1>Playlist builder</h1></div>' +
+      '<button type="button" class="link" data-a="leave">' + (from ? "Back to the " + esc(from) + " menu" : "Home") + "</button></div>" +
+      '<div class="group"><h2 class="label">' + esc(code) + " can't be edited</h2>" +
+      "<p>" + esc(code) + " is built into the site. It always holds every program, starting at its default settings, " +
+      "and new programs join it on their own. To set steps for a student, make a new playlist.</p></div>" +
+      '<button type="button" class="btn primary" data-a="new">Open the playlist builder</button>' +
+      "</div></section>");
+    s.querySelector('[data-a="leave"]').onclick = function () { from ? openCode(from) : home(); };
+    s.querySelector('[data-a="new"]').onclick = builderStart;
+    show(s);
+  }
   function builderOpen(code) {
     var cached = store.cached(code);
     if (cached) { editor({ playlist: cached, isNew: false, dirty: false, from: code }); return; }
@@ -513,6 +532,7 @@
   }
 
   function editor(state) {
+    if (state && state.playlist.builtIn) { builtInNote(state.playlist.code, state.from); return; }
     if (state) ed = state;
     var pl = ed.playlist;
     setUrl("?build=" + encodeURIComponent(pl.code));

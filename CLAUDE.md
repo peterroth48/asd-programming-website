@@ -25,6 +25,10 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
 - **Storage:** a Google Sheet plus an Apps Script web app ("Anyone" access) under Peter's school
   Google account. Reading a playlist needs nothing. Saving (builder edits, staff step bumps)
   needs a staff passcode, entered once per visit and kept only in page memory.
+- **A1** is built in (`allPlaylist` in `shared/store.js`): every registered program, by category then
+  name, at default settings, staff picks. It's made from the program list, never stored, so new
+  programs join it on their own. For demos and checking the site as it grows. Not editable in the
+  builder; setup changes are always just for today; the code maker never hands it out.
 - Use the word "playlist" in everything user-facing (not "K-set" or "program set").
 
 ## Site structure and flow

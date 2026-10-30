@@ -64,7 +64,7 @@ function newCode() {
   allCodes().forEach(function (c) { used[c] = true; });
   for (var tries = 0; tries < 500; tries++) {
     var c = LETTERS.charAt(Math.floor(Math.random() * LETTERS.length)) + (1 + Math.floor(Math.random() * 99));
-    if (!used[c]) return { ok: true, code: c };
+    if (!used[c] && c !== 'A1') return { ok: true, code: c };
   }
   return { ok: false, error: 'full' };
 }
@@ -72,6 +72,7 @@ function newCode() {
 function savePlaylist(given, isNew) {
   var playlist = clean(given);
   if (!playlist) return { ok: false, error: 'bad_request' };
+  if (playlist.code === 'A1') return { ok: false, error: 'built_in' };   // built into the site, never stored
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
