@@ -25,13 +25,13 @@
     B7: { code: "B7", picks: "student", programs: [
       { id: "color-id", settings: { version: "receptive", step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
       { id: "addition-facts", settings: { step: "3", session: "teach", praise: "full", trials: 10, voice: false } },
-      { id: "sound-recognition-receptive", settings: { step: "5", session: "teach", praise: "full", trials: 10, voice: true, text: true } }
+      { id: "sound-recognition", settings: { step: "5", session: "teach", praise: "full", trials: 10, voice: true, text: true } }
     ] },
     R4: { code: "R4", picks: "staff", programs: [
       { id: "color-id", settings: { version: "receptive", step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
       { id: "color-id", settings: { version: "expressive", step: "2", session: "baseline", praise: "full", trials: 8, voice: true, text: true } },
       { id: "addition-facts", settings: { step: "6", session: "teach", praise: "full", trials: 10, voice: false } },
-      { id: "sound-recognition-receptive", settings: { step: "6", session: "teach", praise: "light", trials: 10, voice: true, text: true } }
+      { id: "sound-recognition", settings: { step: "6", session: "teach", praise: "light", trials: 10, voice: true, text: true } }
     ] }
   };
   function demoCall(req) {

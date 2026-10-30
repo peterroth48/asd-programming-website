@@ -1,4 +1,4 @@
-/* Sound Recognition - Receptive (Literacy). Two pictures share one card (rose | rainbow); the
+/* Sound Recognition (Literacy). Two pictures share one card (rose | rainbow); the
    iPad says both words and asks whether they have the same beginning (or ending) sound. The
    student taps Same or Different and the site scores it. Only the first tap per trial is scored.
    Pictures are built-in emoji for now, until a picture source is chosen. */
@@ -237,8 +237,8 @@
   voice.hint = "Off: staff say the two words and the question";
 
   ASD.registerProgram({
-    id: "sound-recognition-receptive",
-    name: "Sound Recognition - Receptive",
+    id: "sound-recognition",
+    name: "Sound Recognition",
     category: "literacy",
     goal: "Student will independently tell whether two words have the same or different beginning (or ending) sound with 80% accuracy or greater over 3 consecutive sessions.",
     icon: '<svg viewBox="0 0 150 100" aria-hidden="true"><rect x="8" y="10" width="134" height="80" rx="16" fill="#fff" stroke="#E08A2E" stroke-width="5"/><line x1="75" y1="22" x2="75" y2="78" stroke="#DDD8CE" stroke-width="3" stroke-dasharray="6 5"/><text x="41" y="66" text-anchor="middle" font-size="40">🌹</text><text x="109" y="66" text-anchor="middle" font-size="40">🌈</text></svg>',
