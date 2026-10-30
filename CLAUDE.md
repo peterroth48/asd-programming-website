@@ -94,7 +94,7 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
   always 0-9, no turnarounds. Steps: 1 +1, 2 +2, 3 mix +1/+2, 4 +3, 5 mix +1 to +3, 6 +4,
   7 mix +1 to +4, 8 +5, 9 +0 (not on paper; placement to check with the team). Correction shows
   the full fact for staff to model. Read-aloud off by default. No staff-scored voice version yet.
-- `spelling`: Spelling - Expressive (Literacy). The site says the word (never shown before the answer), Hear
+- `spelling`: Spelling (Literacy). The site says the word (never shown before the answer), Hear
   again replays it. Answer setting: on-screen keyboard (lowercase, ch/sh/th/wh as single keys,
   Delete, Done; ABC or keyboard order, ABC default) scored by the site, or whiteboard with staff
   ✓ / ✗. Whole word +/−, first try. Correction shows the spelling and says the word. Steps: 1 CVC,
