@@ -24,8 +24,10 @@
   ASD.allPrograms = function () { return order.map(function (id) { return programs[id]; }); };
 
   /* ---------- Standard settings (shared program conventions) ---------- */
-  // Each setting: { key, type: "choice" | "number" | "toggle", label, default, ... }
+  // Each setting: { key, type: "choice" | "number" | "toggle" | "words", label, default, ... }
   //   choice: options [{ v, label, note }]; number: min, max, unit; toggle: hint.
+  //   words: a teacher-edited word list, stored as an array of lowercase words. An empty
+  //   list means "use the built-in list" from builtin(settings). showIf(settings) hides it.
   //   sum: position in the one-line summary (omit to leave it out); sumIf(settings).
   ASD.std = {
     version: function (receptiveNote, expressiveNote) {
@@ -74,11 +76,26 @@
       if (d.type === "choice" && d.options.some(function (o) { return o.v === v; })) s[d.key] = v;
       if (d.type === "number" && typeof v === "number" && isFinite(v)) s[d.key] = Math.min(d.max, Math.max(d.min, Math.round(v)));
       if (d.type === "toggle" && typeof v === "boolean") s[d.key] = v;
+      if (d.type === "words" && Array.isArray(v)) s[d.key] = ASD.parseWords(v.join(" ")).words;
     });
     return s;
   };
+  function same(x, y) { return Array.isArray(x) || Array.isArray(y) ? JSON.stringify(x) === JSON.stringify(y) : x === y; }
   ASD.sameSettings = function (a, b) {
-    return Object.keys(a).every(function (k) { return a[k] === b[k]; }) && Object.keys(b).every(function (k) { return a[k] === b[k]; });
+    return Object.keys(a).every(function (k) { return same(a[k], b[k]); }) && Object.keys(b).every(function (k) { return same(a[k], b[k]); });
+  };
+
+  // Word lists: lowercase letters only, 1 to 20 letters, no repeats, at most MAX_WORDS.
+  // The playlist store checks the same rules (apps-script/Code.gs).
+  ASD.MAX_WORDS = 60;
+  ASD.parseWords = function (text) {
+    var words = [], skipped = [];
+    String(text).toLowerCase().split(/[\s,;]+/).forEach(function (w) {
+      if (!w) return;
+      if (!/^[a-z]{1,20}$/.test(w)) { skipped.push(w); return; }
+      if (words.indexOf(w) < 0 && words.length < ASD.MAX_WORDS) words.push(w);
+    });
+    return { words: words, skipped: skipped };
   };
 
   function optionOf(d, v) {
@@ -92,6 +109,7 @@
       .map(function (d) {
         if (d.type === "choice") { var o = optionOf(d, s[d.key]); return o ? (o.short || o.label) : ""; }
         if (d.type === "number") return s[d.key] + " " + d.unit;
+        if (d.type === "words") return s[d.key].length ? "own list of " + s[d.key].length + " words" : "";
         return "";
       })
       .filter(Boolean).join(" · ");
@@ -112,7 +130,14 @@
   ASD.renderSettings = function (box, program, s, onChange) {
     box.innerHTML = "";
     var rowsGroup = null;
+    var refreshers = [];   // word lists follow the step choice
+    function changed() { refreshers.forEach(function (f) { f(); }); onChange && onChange(); }
     program.settings.forEach(function (d) {
+      if (d.type === "words") {
+        rowsGroup = null;
+        box.appendChild(wordsGroup(d, s, function () { onChange && onChange(); }, refreshers));
+        return;
+      }
       if (d.type === "choice") {
         rowsGroup = null;
         var g = ASD.el('<div class="group"><h2 class="label">' + ASD.esc(d.label) + '</h2><div class="seg"></div><div class="after"></div></div>');
@@ -125,7 +150,7 @@
             seg.querySelectorAll("button").forEach(function (x) { x.classList.remove("sel"); });
             b.classList.add("sel");
             if (d.after) after.innerHTML = d.after(s);
-            onChange && onChange();
+            changed();
           };
           seg.appendChild(b);
         });
@@ -154,6 +179,41 @@
       rowsGroup.appendChild(row);
     });
   };
+
+  // A word list editor: one word per line (spaces or commas work too). Shows the built-in
+  // list until a teacher changes it; matching the built-in list again stores nothing.
+  function wordsGroup(d, s, changed, refreshers) {   // changed: tell the form, without refilling the box
+    var g = ASD.el('<div class="group words"><h2 class="label">' + ASD.esc(d.label) + "</h2>" +
+      (d.hint ? '<p class="hint">' + ASD.esc(d.hint) + "</p>" : "") +
+      '<textarea rows="6" autocapitalize="none" autocorrect="off" autocomplete="off" spellcheck="false" aria-label="' + ASD.esc(d.label) + '"></textarea>' +
+      '<div class="words-foot"><span class="words-status"></span><button type="button" class="link" data-a="builtin">Use the built-in list</button></div>' +
+      '<p class="words-skip" hidden></p></div>');
+    var ta = g.querySelector("textarea"), status = g.querySelector(".words-status");
+    var reset = g.querySelector('[data-a="builtin"]'), skip = g.querySelector(".words-skip");
+    function builtin() { return d.builtin(s); }
+    function paint(fill) {
+      var own = s[d.key].length > 0;
+      g.hidden = d.showIf ? !d.showIf(s) : false;
+      if (fill) ta.value = (own ? s[d.key] : builtin()).join("\n");
+      var n = own ? s[d.key].length : builtin().length;
+      status.textContent = (own ? "Your list" : "Built-in list") + " · " + n + " word" + (n === 1 ? "" : "s");
+      reset.hidden = !own;
+    }
+    ta.addEventListener("input", function () {
+      var r = ASD.parseWords(ta.value);
+      s[d.key] = r.words.join() === builtin().join() ? [] : r.words;
+      skip.hidden = !r.skipped.length;
+      skip.textContent = r.skipped.length ? "Left out (letters only, no spaces or marks): " + r.skipped.join(", ") : "";
+      paint(false);
+      changed();
+    });
+    // An emptied box goes back to the built-in list.
+    ta.addEventListener("blur", function () { if (!ASD.parseWords(ta.value).words.length) { s[d.key] = []; paint(true); changed(); } });
+    reset.onclick = function () { s[d.key] = []; skip.hidden = true; paint(true); changed(); };
+    refreshers.push(function () { paint(true); });
+    paint(true);
+    return g;
+  }
 
   /* ---------- Speech and sounds ---------- */
   var muted = false;   // staff panel "Sounds" switch, page memory only

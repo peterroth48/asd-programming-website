@@ -22,6 +22,8 @@ var ID_RE = /^[a-z0-9-]{1,40}$/;
 var KEY_RE = /^[a-zA-Z0-9_]{1,30}$/;
 var MAX_PROGRAMS = 40;
 var MAX_SETTINGS = 30;
+var MAX_WORDS = 60;                               // word lists (Spelling)
+var WORD_RE = /^[a-z]{1,20}$/;
 
 function doGet(e) {
   var p = (e && e.parameter) || {};
@@ -91,8 +93,9 @@ function savePlaylist(given, isNew) {
   }
 }
 
-// Keeps only what a playlist may hold. Settings values must be short words, numbers
-// or true/false, so there is nowhere to type a name.
+// Keeps only what a playlist may hold. Settings values must be short words, numbers,
+// true/false, or a word list (up to 60 lowercase words of letters only, for programs
+// like Spelling). Nothing else can be stored.
 function clean(p) {
   if (!p || typeof p !== 'object') return null;
   var code = String(p.code || '').toUpperCase();
@@ -109,6 +112,11 @@ function clean(p) {
       if (!KEY_RE.test(key)) return null;
       if (typeof v === 'string') { if (!/^[a-z0-9-]{1,20}$/i.test(v)) return null; }
       else if (typeof v === 'number') { if (!isFinite(v) || Math.abs(v) > 1000) return null; }
+      else if (Array.isArray(v)) {
+        if (v.length > MAX_WORDS) return null;
+        for (var w = 0; w < v.length; w++) if (typeof v[w] !== 'string' || !WORD_RE.test(v[w])) return null;
+        v = v.slice();
+      }
       else if (typeof v !== 'boolean') return null;
       settings[key] = v;
     }
