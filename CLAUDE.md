@@ -98,6 +98,12 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
   always 0-9, no turnarounds. Steps: 1 +1, 2 +2, 3 mix +1/+2, 4 +3, 5 mix +1 to +3, 6 +4,
   7 mix +1 to +4, 8 +5, 9 +0 (not on paper; placement to check with the team). Correction shows
   the full fact for staff to model. Read-aloud off by default. No staff-scored voice version yet.
+- `sound-recognition-receptive`: Sound Recognition - Receptive (Literacy). Two emoji pictures on one
+  card (placeholder until a picture source is chosen); the iPad says both words and the question, with a
+  Hear again button. Student taps Same (two red squares) or Different (red square, green circle).
+  After a correct tap or in correction, the words appear with the sound in bold and the site says why.
+  Steps follow the paper numbers: 5 beginning sounds, 6 ending sounds (7, worksheets, stays on paper).
+  Half the pairs are same, no blends at the start, whole words only.
 - When Peter describes a new program he'll give its category too.
 - Naming: a program with both a receptive and an expressive version is two separate programs,
   "<Name> - Receptive" and "<Name> - Expressive" (ids `<name>-receptive`, `<name>-expressive`).
