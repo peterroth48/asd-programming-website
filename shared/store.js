@@ -23,11 +23,13 @@
   /* ---------- Demo mode: in page memory, gone on reload ---------- */
   var demo = {
     B7: { code: "B7", picks: "student", programs: [
-      { id: "color-id", settings: { version: "receptive", step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } }
+      { id: "color-id", settings: { version: "receptive", step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
+      { id: "addition-facts", settings: { step: "3", session: "teach", praise: "full", trials: 10, voice: false } }
     ] },
     R4: { code: "R4", picks: "staff", programs: [
       { id: "color-id", settings: { version: "receptive", step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
-      { id: "color-id", settings: { version: "expressive", step: "2", session: "baseline", praise: "full", trials: 8, voice: true, text: true } }
+      { id: "color-id", settings: { version: "expressive", step: "2", session: "baseline", praise: "full", trials: 8, voice: true, text: true } },
+      { id: "addition-facts", settings: { step: "6", session: "teach", praise: "full", trials: 10, voice: false } }
     ] }
   };
   function demoCall(req) {

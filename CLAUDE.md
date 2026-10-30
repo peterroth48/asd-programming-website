@@ -89,4 +89,9 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
 - `color-id`: Color ID (Literacy). Step 1: red, blue, green, yellow. Step 2: purple, orange,
   black, brown, pink. Receptive: 3 choices. Open questions: hide color word by default? Mix
   Step 1 colors into Step 2 distractors?
+- `addition-facts`: Addition Facts (Math). One big fact card, the student taps the answer on a pad
+  of number buttons (0-10 for steps 1 and 9, else 0-20) and the site scores it. First number is
+  always 0-9, no turnarounds. Steps: 1 +1, 2 +2, 3 mix +1/+2, 4 +3, 5 mix +1 to +3, 6 +4,
+  7 mix +1 to +4, 8 +5, 9 +0 (not on paper; placement to check with the team). Correction shows
+  the full fact for staff to model. Read-aloud off by default. No staff-scored voice version yet.
 - When Peter describes a new program he'll give its category too.
