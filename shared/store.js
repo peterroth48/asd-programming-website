@@ -23,12 +23,12 @@
   /* ---------- Demo mode: in page memory, gone on reload ---------- */
   var demo = {
     B7: { code: "B7", picks: "student", programs: [
-      { id: "color-id", settings: { version: "receptive", step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
+      { id: "color-id-receptive", settings: { step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
       { id: "addition-facts", settings: { step: "3", session: "teach", praise: "full", trials: 10, voice: false } }
     ] },
     R4: { code: "R4", picks: "staff", programs: [
-      { id: "color-id", settings: { version: "receptive", step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
-      { id: "color-id", settings: { version: "expressive", step: "2", session: "baseline", praise: "full", trials: 8, voice: true, text: true } },
+      { id: "color-id-receptive", settings: { step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
+      { id: "color-id-expressive", settings: { step: "2", session: "baseline", praise: "full", trials: 8, voice: true, text: true } },
       { id: "addition-facts", settings: { step: "6", session: "teach", praise: "full", trials: 10, voice: false } }
     ] }
   };
@@ -54,6 +54,19 @@
         resolve({ ok: false, error: "bad_request" });
       }, 250);
     });
+  }
+
+  /* ---------- Older playlists ---------- */
+  // Color ID used to be one program with a receptive/expressive version setting. It's now two
+  // programs, so an older entry opens as the matching one (saved that way on the next save).
+  function upgrade(playlist) {
+    (playlist.programs || []).forEach(function (p) {
+      if (p.id !== "color-id") return;
+      var s = p.settings || {};
+      p.id = s.version === "expressive" ? "color-id-expressive" : "color-id-receptive";
+      delete s.version;
+    });
+    return playlist;
   }
 
   /* ---------- Apps Script ---------- */
@@ -84,7 +97,7 @@
 
     get: function (code) {
       return call({ action: "get", code: code }).then(function (res) {
-        if (res.ok) cache[code] = res.playlist;
+        if (res.ok) cache[code] = upgrade(res.playlist);
         return res;
       });
     },
