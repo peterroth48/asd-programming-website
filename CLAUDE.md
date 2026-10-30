@@ -94,4 +94,14 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
   always 0-9, no turnarounds. Steps: 1 +1, 2 +2, 3 mix +1/+2, 4 +3, 5 mix +1 to +3, 6 +4,
   7 mix +1 to +4, 8 +5, 9 +0 (not on paper; placement to check with the team). Correction shows
   the full fact for staff to model. Read-aloud off by default. No staff-scored voice version yet.
+- `spelling`: Spelling (Literacy). The site says the word (never shown before the answer), Hear
+  again replays it. Answer setting: on-screen keyboard (lowercase, ch/sh/th/wh as single keys,
+  Delete, Done; ABC or keyboard order, ABC default) scored by the site, or whiteboard with staff
+  ✓ / ✗. Whole word +/−, first try. Correction shows the spelling and says the word. Steps: 1 CVC,
+  2 ch/sh/th/wh at the start, 3 at the end, 4 in the middle. Steps 2-3 lists are every word on
+  the paper sheet (names and uncommon words kept on purpose). Each step has its own editable
+  word list (`words1`..`words4`, empty = built-in list). Speech off: staff hold a corner button
+  to see the word.
+- Word-list settings (type "words") are arrays of up to 60 lowercase words, letters only; the
+  Apps Script store checks the same rule.
 - When Peter describes a new program he'll give its category too.

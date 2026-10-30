@@ -28,7 +28,7 @@ body {
   touch-action: manipulation;
   overflow: hidden;
 }
-input { -webkit-user-select: text; user-select: text; }
+input, textarea { -webkit-user-select: text; user-select: text; }
 button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
 a { color: var(--accent); }
 [hidden] { display: none !important; }
@@ -76,6 +76,12 @@ h1 { font-size: 34px; line-height: 40px; margin: 0; letter-spacing: -0.5px; }
 .toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 28px; height: 28px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
 .toggle.sel { background: var(--good); }
 .toggle.sel::after { left: 27px; }
+.words .hint { color: var(--muted); font-size: 14px; margin: -6px 0 10px; }
+.words textarea { width: 100%; min-height: 150px; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--soft);
+  font: 18px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--ink); resize: vertical; }
+.words textarea:focus { outline: none; border-color: var(--accent); }
+.words-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 6px; font-size: 14px; color: var(--muted); }
+.words-skip { margin: 6px 0 0; font-size: 14px; color: #8A3A10; }
 .stepper { display: flex; align-items: center; gap: 10px; }
 .stepper button { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--line); background: var(--soft); font-size: 22px; font-weight: 700; padding: 0; }
 .stepper span { min-width: 36px; text-align: center; font-size: 20px; font-weight: 700; }
