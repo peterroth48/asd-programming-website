@@ -218,7 +218,7 @@
 
   ASD.registerProgram({
     id: "spelling",
-    name: "Spelling",
+    name: "Spelling - Expressive",
     category: "literacy",
     goal: "Student will independently spell words with 80% accuracy or greater over 3 consecutive sessions.",
     icon: '<svg viewBox="0 0 150 100" aria-hidden="true"><rect x="8" y="22" width="134" height="56" rx="14" fill="#fff" stroke="#E08A2E" stroke-width="5"/><text x="75" y="63" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="34" font-weight="600" letter-spacing="3" fill="#22262B">ship</text></svg>',
