@@ -714,7 +714,7 @@
 
   /* =========================================================
      Start: ?p=B7 opens a playlist (home-screen shortcuts, QR cards),
-     ?build or ?build=B7 opens the builder, ?try=color-id previews one program.
+     ?build or ?build=B7 opens the builder, ?try=color-id-receptive previews one program.
      ========================================================= */
   var q = {};
   location.search.replace(/^\?/, "").split("&").forEach(function (kv) {

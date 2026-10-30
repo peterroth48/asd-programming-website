@@ -75,7 +75,7 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
 - `apps-script/`: `Code.gs` (Sheet-backed store) and `SETUP.md` (deploy steps).
 
 ## Shared program conventions (from Color ID)
-- Staff setup screen: version (receptive/expressive), step, session (teaching/baseline),
+- Staff setup screen: step, session (teaching/baseline),
   praise (computer praises = default; staff praises = ding + green highlight only),
   trial count, read-aloud toggle, show-prompt-text toggle.
 - Scoring: only the first response per trial counts, as + / −.
@@ -86,9 +86,13 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
 - Built-in iPad speech for prompts (not for phoneme/letter-sound work; use recorded audio there).
 
 ## Programs
-- `color-id`: Color ID (Literacy). Step 1: red, blue, green, yellow. Step 2: purple, orange,
-  black, brown, pink. Receptive: 3 choices. Open questions: hide color word by default? Mix
-  Step 1 colors into Step 2 distractors?
+- `color-id-receptive` and `color-id-expressive`: Color ID - Receptive and Color ID - Expressive
+  (Literacy). They share one activity in `programs/color-id/common.js`; each one's `program.js`
+  calls `ASD.colorId.register(version)`. Step 1: red, blue, green, yellow. Step 2: purple, orange,
+  black, brown, pink. Receptive: 3 choices. Expressive: one big color, staff tap ✓ / ✗. Playlists
+  saved before the split (id `color-id` with a version setting) open as the matching program
+  (`upgrade` in `shared/store.js`). Open questions: hide color word by default? Mix Step 1 colors
+  into Step 2 distractors?
 - `addition-facts`: Addition Facts (Math). One big fact card, the student taps the answer on a pad
   of number buttons (0-10 for steps 1 and 9, else 0-20) and the site scores it. First number is
   always 0-9, no turnarounds. Steps: 1 +1, 2 +2, 3 mix +1/+2, 4 +3, 5 mix +1 to +3, 6 +4,
@@ -100,5 +104,7 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
   After a correct tap or in correction, the words appear with the sound in bold and the site says why.
   Steps follow the paper numbers: 5 beginning sounds, 6 ending sounds (7, worksheets, stays on paper).
   Half the pairs are same, no blends at the start, whole words only.
-- New programs are named "Name - Receptive" or "Name - Expressive" (full word).
 - When Peter describes a new program he'll give its category too.
+- Naming: a program with both a receptive and an expressive version is two separate programs,
+  "<Name> - Receptive" and "<Name> - Expressive" (ids `<name>-receptive`, `<name>-expressive`).
+  A program without that split keeps its plain name (Addition Facts).

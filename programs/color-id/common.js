@@ -1,5 +1,7 @@
-/* Color ID (Literacy). Receptive: "Point to ___" with 3 choices. Expressive: "What color
-   is this?" and staff tap ✓ / ✗. Only the first response per trial is scored. */
+/* Shared code for the two Color ID programs (Literacy): color-id-receptive ("Point to ___"
+   with 3 choices) and color-id-expressive ("What color is this?" and staff tap ✓ / ✗).
+   Each one's program.js registers it with ASD.colorId.register(version).
+   Only the first response per trial is scored. */
 (function () {
   "use strict";
 
@@ -64,7 +66,7 @@
     return out;
   }
 
-  function run(ctx) {
+  function run(ctx, version) {
     var s = ctx.settings;
     var root = ctx.stage;
     root.innerHTML =
@@ -74,7 +76,7 @@
       '<div class="cid-model"></div>';
     var $ = function (sel) { return root.querySelector(sel); };
     var scorebar = null;
-    if (s.version === "expressive") {
+    if (version === "expressive") {
       scorebar = ASD.el('<div class="cid-scorebar"><span class="lbl">Staff:</span>' +
         '<button type="button" style="background:#2E9E44">✓ Correct</button>' +
         '<button type="button" style="background:#C9541A">✗ Incorrect / no response</button></div>');
@@ -87,7 +89,7 @@
 
     var st = { targets: buildTargets(s), i: 0, corrections: 0, phase: "first", locked: false };
 
-    function promptFor(target) { return s.version === "receptive" ? "Point to " + target + "." : "What color is this?"; }
+    function promptFor(target) { return version === "receptive" ? "Point to " + target + "." : "What color is this?"; }
     $(".cid-speak").onclick = function () { ctx.say(promptFor(st.targets[st.i])); };
     $(".cid-speak").style.display = s.voice ? "" : "none";
 
@@ -99,7 +101,7 @@
       $(".cid-text").textContent = s.text ? promptFor(target) : "";
 
       var box = $(".cid-choices"); box.innerHTML = "";
-      if (s.version === "receptive") {
+      if (version === "receptive") {
         var others = ASD.shuffle(STEPS[s.step].filter(function (c) { return c !== target; })).slice(0, RECEPTIVE_CHOICES - 1);
         ASD.shuffle(others.concat([target])).forEach(function (c) {
           var b = document.createElement("button");
@@ -153,7 +155,7 @@
 
     // Correction: model the correct answer, then re-present.
     function modelAnswer(target, then) {
-      if (s.version === "receptive") {
+      if (version === "receptive") {
         root.querySelectorAll(".cid-swatch").forEach(function (x) {
           x.classList.toggle("dim", x.dataset.c !== target);
           x.classList.toggle("hilite", x.dataset.c === target);
@@ -173,25 +175,39 @@
     presentTrial();
   }
 
-  ASD.registerProgram({
-    id: "color-id",
-    name: "Color ID",
-    category: "literacy",
-    goal: "Student will independently identify colors with 80% accuracy or greater over 3 consecutive sessions.",
-    icon: '<svg viewBox="0 0 150 100" aria-hidden="true"><circle cx="40" cy="50" r="32" fill="#D93A2B"/><circle cx="75" cy="50" r="32" fill="#2F6FDE" opacity="0.95"/><circle cx="110" cy="50" r="32" fill="#F2C230" opacity="0.95"/></svg>',
-    settings: [
-      ASD.std.version("\"Point to ___\" · 3 choices", "\"What color is this?\" · staff scores"),
-      { key: "step", type: "choice", label: "Step", default: "1", sum: 1, after: chips, options: [
-        { v: "1", label: "Step 1", note: "4 colors" },
-        { v: "2", label: "Step 2", note: "5 colors" },
-        { v: "all", label: "All 9", short: "All 9 colors", note: "review" }
-      ] },
-      ASD.std.session(),
-      ASD.std.praise(),
-      ASD.std.trials(10),
-      ASD.std.voice(),
-      ASD.std.text("Turn off for students who might read the color word")
-    ],
-    run: run
-  });
+  var NAMES = { receptive: "Color ID - Receptive", expressive: "Color ID - Expressive" };
+  var GOALS = {
+    receptive: "Student will independently identify colors with 80% accuracy or greater over 3 consecutive sessions.",
+    expressive: "Student will independently name colors with 80% accuracy or greater over 3 consecutive sessions."
+  };
+  // Receptive: three colors to pick from. Expressive: one big color to name.
+  var ICONS = {
+    receptive: '<svg viewBox="0 0 150 100" aria-hidden="true"><circle cx="40" cy="50" r="32" fill="#D93A2B"/><circle cx="75" cy="50" r="32" fill="#2F6FDE" opacity="0.95"/><circle cx="110" cy="50" r="32" fill="#F2C230" opacity="0.95"/></svg>',
+    expressive: '<svg viewBox="0 0 150 100" aria-hidden="true"><circle cx="75" cy="50" r="42" fill="#2F6FDE"/></svg>'
+  };
+
+  ASD.colorId = {
+    register: function (version) {
+      ASD.registerProgram({
+        id: "color-id-" + version,
+        name: NAMES[version],
+        category: "literacy",
+        goal: GOALS[version],
+        icon: ICONS[version],
+        settings: [
+          { key: "step", type: "choice", label: "Step", default: "1", sum: 1, after: chips, options: [
+            { v: "1", label: "Step 1", note: "4 colors" },
+            { v: "2", label: "Step 2", note: "5 colors" },
+            { v: "all", label: "All 9", short: "All 9 colors", note: "review" }
+          ] },
+          ASD.std.session(),
+          ASD.std.praise(),
+          ASD.std.trials(10),
+          ASD.std.voice(),
+          ASD.std.text("Turn off for students who might read the color word")
+        ],
+        run: function (ctx) { run(ctx, version); }
+      });
+    }
+  };
 })();
