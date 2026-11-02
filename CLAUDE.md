@@ -25,6 +25,10 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
 - **Storage:** a Google Sheet plus an Apps Script web app ("Anyone" access) under Peter's school
   Google account. Reading a playlist needs nothing. Saving (builder edits, staff step bumps)
   needs a staff passcode, entered once per visit and kept only in page memory.
+- **A1** is built in (`allPlaylist` in `shared/store.js`): every registered program, by category then
+  name, at default settings, staff picks. It's made from the program list, never stored, so new
+  programs join it on their own. For demos and checking the site as it grows. Not editable in the
+  builder; setup changes are always just for today; the code maker never hands it out.
 - Use the word "playlist" in everything user-facing (not "K-set" or "program set").
 
 ## Site structure and flow
@@ -75,7 +79,7 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
 - `apps-script/`: `Code.gs` (Sheet-backed store) and `SETUP.md` (deploy steps).
 
 ## Shared program conventions (from Color ID)
-- Staff setup screen: version (receptive/expressive), step, session (teaching/baseline),
+- Staff setup screen: step, session (teaching/baseline),
   praise (computer praises = default; staff praises = ding + green highlight only),
   trial count, read-aloud toggle, show-prompt-text toggle.
 - Scoring: only the first response per trial counts, as + / −.
@@ -86,14 +90,24 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
 - Built-in iPad speech for prompts (not for phoneme/letter-sound work; use recorded audio there).
 
 ## Programs
-- `color-id`: Color ID (Literacy). Step 1: red, blue, green, yellow. Step 2: purple, orange,
-  black, brown, pink. Receptive: 3 choices. Open questions: hide color word by default? Mix
-  Step 1 colors into Step 2 distractors?
+- `color-id-receptive` and `color-id-expressive`: Color ID - Receptive and Color ID - Expressive
+  (Literacy). They share one activity in `programs/color-id/common.js`; each one's `program.js`
+  calls `ASD.colorId.register(version)`. Step 1: red, blue, green, yellow. Step 2: purple, orange,
+  black, brown, pink. Receptive: 3 choices. Expressive: one big color, staff tap ✓ / ✗. Playlists
+  saved before the split (id `color-id` with a version setting) open as the matching program
+  (`upgrade` in `shared/store.js`). Open questions: hide color word by default? Mix Step 1 colors
+  into Step 2 distractors?
 - `addition-facts`: Addition Facts (Math). One big fact card, the student taps the answer on a pad
   of number buttons (0-10 for steps 1 and 9, else 0-20) and the site scores it. First number is
   always 0-9, no turnarounds. Steps: 1 +1, 2 +2, 3 mix +1/+2, 4 +3, 5 mix +1 to +3, 6 +4,
   7 mix +1 to +4, 8 +5, 9 +0 (not on paper; placement to check with the team). Correction shows
   the full fact for staff to model. Read-aloud off by default. No staff-scored voice version yet.
+- `sound-recognition-receptive`: Sound Recognition - Receptive (Literacy). Two emoji pictures on one
+  card (placeholder until a picture source is chosen); the iPad says both words and the question, with a
+  Hear again button. Student taps Same (two red squares) or Different (red square, green circle).
+  After a correct tap or in correction, the words appear with the sound in bold and the site says why.
+  Steps follow the paper numbers: 5 beginning sounds, 6 ending sounds (7, worksheets, stays on paper).
+  Half the pairs are same, no blends at the start, whole words only.
 - `spelling`: Spelling (Literacy). The site says the word (never shown before the answer), Hear
   again replays it. Answer setting: on-screen keyboard (lowercase, ch/sh/th/wh as single keys,
   Delete, Done; ABC or keyboard order, ABC default) scored by the site, or whiteboard with staff
@@ -105,3 +119,6 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
 - Word-list settings (type "words") are arrays of up to 60 lowercase words, letters only; the
   Apps Script store checks the same rule.
 - When Peter describes a new program he'll give its category too.
+- Naming: a program with both a receptive and an expressive version is two separate programs,
+  "<Name> - Receptive" and "<Name> - Expressive" (ids `<name>-receptive`, `<name>-expressive`).
+  A program without that split keeps its plain name (Addition Facts).

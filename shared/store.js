@@ -15,22 +15,40 @@
   var LETTERS = "ABCDEFGHJLMNPQRSTUVWXYZ".split("");
   var CODE_RE = /^[ABCDEFGHJLMNPQRSTUVWXYZ][1-9][0-9]?$/;
 
+  // A1 is built in: every program on the site, at its default settings, staff picks.
+  // It's made here from the program list, so new programs join it on their own. Never saved.
+  var ALL = "A1";
+  function allPlaylist() {
+    var cats = Object.keys(ASD.CATEGORIES);
+    var progs = ASD.allPrograms().slice().sort(function (a, b) {
+      return cats.indexOf(a.category) - cats.indexOf(b.category) || a.name.localeCompare(b.name);
+    });
+    return { code: ALL, picks: "staff", builtIn: true, programs: progs.map(function (p) {
+      return { id: p.id, settings: ASD.defaults(p) };
+    }) };
+  }
+
   function clone(x) { return JSON.parse(JSON.stringify(x)); }
   function randomCode() {
-    return LETTERS[Math.floor(Math.random() * LETTERS.length)] + (1 + Math.floor(Math.random() * 99));
+    var c;
+    do c = LETTERS[Math.floor(Math.random() * LETTERS.length)] + (1 + Math.floor(Math.random() * 99));
+    while (c === ALL);
+    return c;
   }
 
   /* ---------- Demo mode: in page memory, gone on reload ---------- */
   var demo = {
     B7: { code: "B7", picks: "student", programs: [
-      { id: "color-id", settings: { version: "receptive", step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
+      { id: "color-id-receptive", settings: { step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
       { id: "addition-facts", settings: { step: "3", session: "teach", praise: "full", trials: 10, voice: false } },
+      { id: "sound-recognition-receptive", settings: { step: "5", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
       { id: "spelling", settings: { step: "2", answer: "keyboard", keys: "abc", session: "teach", praise: "full", trials: 10, voice: true } }
     ] },
     R4: { code: "R4", picks: "staff", programs: [
-      { id: "color-id", settings: { version: "receptive", step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
-      { id: "color-id", settings: { version: "expressive", step: "2", session: "baseline", praise: "full", trials: 8, voice: true, text: true } },
+      { id: "color-id-receptive", settings: { step: "1", session: "teach", praise: "full", trials: 10, voice: true, text: true } },
+      { id: "color-id-expressive", settings: { step: "2", session: "baseline", praise: "full", trials: 8, voice: true, text: true } },
       { id: "addition-facts", settings: { step: "6", session: "teach", praise: "full", trials: 10, voice: false } },
+      { id: "sound-recognition-receptive", settings: { step: "6", session: "teach", praise: "light", trials: 10, voice: true, text: true } },
       { id: "spelling", settings: { step: "1", words1: ["cat", "dog", "sun", "map", "bed"], answer: "board", keys: "abc", session: "teach", praise: "light", trials: 5, voice: true } }
     ] }
   };
@@ -56,6 +74,19 @@
         resolve({ ok: false, error: "bad_request" });
       }, 250);
     });
+  }
+
+  /* ---------- Older playlists ---------- */
+  // Color ID used to be one program with a receptive/expressive version setting. It's now two
+  // programs, so an older entry opens as the matching one (saved that way on the next save).
+  function upgrade(playlist) {
+    (playlist.programs || []).forEach(function (p) {
+      if (p.id !== "color-id") return;
+      var s = p.settings || {};
+      p.id = s.version === "expressive" ? "color-id-expressive" : "color-id-receptive";
+      delete s.version;
+    });
+    return playlist;
   }
 
   /* ---------- Apps Script ---------- */
@@ -84,14 +115,21 @@
     hasPasscode: function () { return passcode !== null; },
     forgetPasscode: function () { passcode = null; },
 
+    ALL: ALL,
     get: function (code) {
+      if (code === ALL) return Promise.resolve({ ok: true, playlist: allPlaylist() });
       return call({ action: "get", code: code }).then(function (res) {
-        if (res.ok) cache[code] = res.playlist;
+        if (res.ok) cache[code] = upgrade(res.playlist);
         return res;
       });
     },
     cached: function (code) { return cache[code] ? clone(cache[code]) : null; },
-    newCode: function () { return call({ action: "newcode" }); },
+    // An Apps Script deployed before A1 existed could still hand it out, so ask again.
+    newCode: function () {
+      return call({ action: "newcode" }).then(function (res) {
+        return res.ok && res.code === ALL ? ASD.store.newCode() : res;
+      });
+    },
 
     // Checks a passcode with the server and keeps it for this visit if it's right.
     checkPasscode: function (pc) {
@@ -101,6 +139,7 @@
       });
     },
     save: function (playlist, isNew) {
+      if (playlist.code === ALL) return Promise.resolve({ ok: false, error: "built_in" });
       return call({ action: "save", passcode: passcode, playlist: playlist, isNew: !!isNew }).then(function (res) {
         if (res.ok) cache[playlist.code] = clone(playlist);
         if (res.error === "passcode") passcode = null;
