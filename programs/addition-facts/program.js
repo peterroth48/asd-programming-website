@@ -156,7 +156,7 @@
         x.classList.toggle("right", Number(x.dataset.n) === sum);
       });
       ctx.say(f.a + " plus " + f.b + " is " + sum + ".");
-      ctx.later(then, MODEL_MS);
+      ctx.afterCorrection(then, MODEL_MS);
     }
 
     function nextTrial() {
@@ -194,7 +194,8 @@
       ASD.std.session(),
       ASD.std.praise(),
       ASD.std.trials(10),
-      voice
+      voice,
+      ASD.std.pause()
     ],
     run: run
   });

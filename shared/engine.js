@@ -58,6 +58,10 @@
     },
     text: function (hint) {
       return { key: "text", type: "toggle", label: "Show prompt as text", hint: hint, default: true };
+    },
+    // Correction screens stay up until someone taps Continue (ctx.afterCorrection).
+    pause: function () {
+      return { key: "pause", type: "toggle", label: "Pause on corrections", hint: "On: waits for a tap on Continue. Off: moves on after a few seconds", default: true };
     }
   };
 

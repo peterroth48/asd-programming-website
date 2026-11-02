@@ -74,16 +74,22 @@ used by students on school iPads in Safari. Owner: Peter (EdTech, Portland ME el
   category, goal, icon, settings, run })`. `settings` uses `ASD.std.*` for the shared ones.
   `run(ctx)` draws into `ctx.stage` and uses `ctx.record(correct)` (first response only),
   `ctx.progress(i, n)`, `ctx.say`, `ctx.chime`, `ctx.later` (timers the shell can cancel),
-  `ctx.finish()`. Add each new program's script tag to `index.html`.
+  `ctx.afterCorrection(then, ms)` (Continue button or timer, see below), `ctx.finish()`.
+  Add each new program's script tag to `index.html`.
   `programs/<program-id>/index.html` just opens the program in the shell (`?try=`).
 - `apps-script/`: `Code.gs` (Sheet-backed store) and `SETUP.md` (deploy steps).
 
 ## Shared program conventions (from Color ID)
 - Staff setup screen: step, session (teaching/baseline),
   praise (computer praises = default; staff praises = ding + green highlight only),
-  trial count, read-aloud toggle, show-prompt-text toggle.
+  trial count, read-aloud toggle, show-prompt-text toggle, pause-on-corrections toggle.
 - Scoring: only the first response per trial counts, as + / −.
 - Correction: model the correct answer, re-present; repeat until 1x independent, max 3x.
+- Pause on corrections (`ASD.std.pause()`, on by default): after a wrong answer the correction
+  screen stays up until the student or staff taps a big Continue button at the bottom, so the
+  student has time to take in the feedback. Off: it moves on by itself after a few seconds.
+  Every program with a correction screen uses it, through `ctx.afterCorrection`. Correct answers
+  and baseline still move on by themselves.
 - Baseline: no prompts, no reinforcement.
 - Expressive versions: student answers by voice/AAC; staff tap ✓ / ✗.
 - End screen notes the mastery rule: 80%+ for 3 consecutive sessions → next step.

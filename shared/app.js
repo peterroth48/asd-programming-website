@@ -13,6 +13,7 @@
   var CHEV = '<svg class="chev" viewBox="0 0 14 24" aria-hidden="true"><path d="M2 2 L12 12 L2 22" fill="none" stroke="#8A8F96" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var LEFT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 L7 12 L15 20" fill="none" stroke="#22262B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var RIGHT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 L17 12 L9 20" fill="none" stroke="#22262B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var CONTINUE_ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var DONE_ART = '<svg class="end-art" viewBox="0 0 160 160" aria-hidden="true"><circle cx="80" cy="80" r="74" fill="#E5F4E4" stroke="#2E9E44" stroke-width="6"/><path d="M48 82 L70 104 L114 58" fill="none" stroke="#2E9E44" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   /* ---------- Screen plumbing ---------- */
@@ -361,6 +362,21 @@
       say: function (t) { if (settings.voice !== false) ASD.say(t); },
       chime: function () { if (settings.session !== "baseline") ASD.chime(); },
       record: function (correct) { marks.push(correct ? "+" : "-"); },
+      // After a correction is shown: with "Pause on corrections" on, wait for a Continue tap so
+      // the student has time to take it in; otherwise move on after ms.
+      afterCorrection: function (then, ms) {
+        if (settings.pause !== true) return ctx.later(then, ms);
+        var b = el('<button type="button" class="continue">Continue' + CONTINUE_ARROW + "</button>");
+        var ready = false;
+        ctx.later(function () { ready = true; }, 600);   // ignore a stray double tap on the answer
+        b.onclick = function () {
+          if (!ready) return;
+          b.remove(); stage.classList.remove("paused");
+          then();
+        };
+        stage.classList.add("paused");
+        stage.appendChild(b);
+      },
       progress: function (i, n) {
         var h = "";
         for (var k = 0; k < n; k++) h += '<i class="' + (k < i ? "done" : k === i ? "now" : "") + '"></i>';
@@ -371,7 +387,9 @@
       finish: function () { stop(); end(it, settings, marks, opts); }
     };
     function start() {
-      stop(); marks = []; stage.innerHTML = ""; prog.innerHTML = "";
+      stop(); marks = []; stage.innerHTML = ""; prog.innerHTML = ""; stage.classList.remove("paused");
+      // Keep room for Continue from the start, so nothing moves when a correction pauses.
+      stage.classList.toggle("has-continue", settings.pause === true);
       it.prog.run(ctx);
     }
     wireStaffButton(s, {
