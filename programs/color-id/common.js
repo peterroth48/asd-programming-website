@@ -40,6 +40,7 @@
     ".cid-burst svg { width: 54px; height: 54px; }" +
     ".cid-scorebar { position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; gap: 16px; padding: 16px; background: rgba(246,244,239,.95); border-top: 1px solid #DDD8CE; z-index: 3; }" +
     ".cid-scorebar .lbl { align-self: center; color: #5F656C; font-size: 14px; margin-right: 6px; }" +
+    ".paused .cid-scorebar { visibility: hidden; }" +
     ".cid-scorebar button { min-width: 170px; padding: 16px 20px; border-radius: 14px; border: none; font-size: 19px; font-weight: 700; color: #fff; }";
 
   var SPEAKER = '<svg viewBox="0 0 24 24" fill="none" stroke="#22262B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
@@ -163,7 +164,7 @@
       }
       $(".cid-model").textContent = ASD.cap(target);
       ctx.say("This is " + target + ".");
-      ctx.later(then, 2600);
+      ctx.afterCorrection(then, 2600);
     }
 
     function nextTrial() {
@@ -204,7 +205,8 @@
           ASD.std.praise(),
           ASD.std.trials(10),
           ASD.std.voice(),
-          ASD.std.text("Turn off for students who might read the color word")
+          ASD.std.text("Turn off for students who might read the color word"),
+          ASD.std.pause()
         ],
         run: function (ctx) { run(ctx, version); }
       });
