@@ -45,22 +45,22 @@
   var PRAISE = ["Great job!", "You got it!", "Nice work!", "That's right!"];
 
   var CSS =
-    ".sr-hear { display: flex; align-items: center; gap: 12px; background: #2F6FDE; color: #fff; border: 0; border-radius: 20px; font-size: clamp(22px, 3vw, 28px); font-weight: 700; padding: 14px 28px; min-height: 64px; margin-bottom: 3vh; }" +
+    ".sr-hear { display: flex; align-items: center; gap: 12px; background: #2F6FDE; color: #fff; border: 0; border-radius: 20px; font-size: clamp(22px, 3vw, 28px); font-weight: 700; padding: 14px 28px; min-height: 64px; margin-bottom: 2vh; }" +
     ".sr-hear svg { width: 32px; height: 32px; }" +
     ".sr-pair { display: flex; align-items: stretch; background: #fff; border: 3px solid #DDD8CE; border-radius: 32px; padding: 2.4vh 16px; }" +
     ".sr-pic { width: clamp(180px, 26vw, 260px); display: flex; flex-direction: column; align-items: center; justify-content: center; }" +
     ".sr-pic + .sr-pic { border-left: 3px dashed #DDD8CE; }" +
-    ".sr-emoji { font-size: clamp(96px, 14vw, 150px); line-height: 1.1; }" +
+    ".sr-emoji { font-size: clamp(76px, min(14vw, 12vh), 150px); line-height: 1.1; }" +
     ".sr-word { font-size: clamp(30px, 4vw, 40px); min-height: 1.4em; margin-top: 6px; color: #3E444A; }" +
     ".sr-word b { color: #22262B; font-weight: 800; text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 5px; }" +
-    ".sr-say { font-size: clamp(24px, 3.4vw, 34px); font-weight: 700; text-align: center; margin: 3vh 20px; min-height: 1.3em; }" +
+    ".sr-say { font-size: clamp(24px, 3.4vw, 34px); font-weight: 700; text-align: center; margin: 2vh 20px; min-height: 1.3em; }" +
     ".sr-answers { display: flex; gap: clamp(24px, 5vw, 56px); }" +
-    ".sr-btn { width: clamp(220px, 28vw, 290px); border: 4px solid #2F6FDE; background: #EAF1FC; border-radius: 28px; padding: 18px 0 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: #22262B; box-shadow: 0 5px 0 #2F6FDE; }" +
+    ".sr-btn { width: clamp(220px, 28vw, 290px); border: 4px solid #2F6FDE; background: #EAF1FC; border-radius: 28px; padding: min(18px, 2vh) 0 min(14px, 1.6vh); display: flex; flex-direction: column; align-items: center; gap: min(8px, 1vh); color: #22262B; box-shadow: 0 5px 0 #2F6FDE; }" +
     ".sr-btn .sym { display: flex; gap: 10px; }" +
     ".sr-btn .sq, .sr-btn .ci { width: 38px; height: 38px; display: block; }" +
     ".sr-btn .sq { background: #D33A2C; }" +
     ".sr-btn .ci { background: #2E9E44; border-radius: 50%; }" +
-    ".sr-btn b { font-size: clamp(36px, 4.6vw, 46px); line-height: 1.1; }" +
+    ".sr-btn b { font-size: clamp(34px, min(4.6vw, 5.6vh), 46px); line-height: 1.1; }" +
     ".sr-btn small { font-size: 20px; color: #5F656C; }" +
     ".sr-btn.right { border-color: #2E9E44; background: #E8F5EB; box-shadow: 0 5px 0 #2E9E44; }" +
     ".sr-btn.hilite { box-shadow: 0 0 0 6px #fff, 0 0 0 12px #22262B; }" +
@@ -220,7 +220,7 @@
       });
       say.textContent = explain(t);
       ctx.say(explain(t));
-      ctx.later(then, MODEL_MS);
+      ctx.afterCorrection(then, MODEL_MS);
     }
 
     function nextTrial() {
@@ -251,7 +251,8 @@
       ASD.std.praise(),
       ASD.std.trials(10),
       voice,
-      ASD.std.text("Shows \"Same beginning sound, or different?\" on the screen")
+      ASD.std.text("Shows \"Same beginning sound, or different?\" on the screen"),
+      ASD.std.pause()
     ],
     run: run
   });
