@@ -50,6 +50,7 @@
     ".sp-burst { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: clamp(36px, 6vw, 60px); font-weight: 800; color: #2E9E44; background: #fff; padding: 18px 34px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,.15); display: flex; align-items: center; gap: 14px; white-space: nowrap; z-index: 4; }" +
     ".sp-burst svg { width: 54px; height: 54px; }" +
     ".sp-scorebar { position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; gap: 16px; padding: 16px; background: rgba(246,244,239,.95); border-top: 1px solid #DDD8CE; z-index: 3; }" +
+    ".paused .sp-scorebar, .paused .sp-peek { visibility: hidden; }" +
     ".sp-scorebar .lbl { align-self: center; color: #5F656C; font-size: 14px; margin-right: 6px; }" +
     ".sp-scorebar button { min-width: 170px; padding: 16px 20px; border-radius: 14px; border: none; font-size: 19px; font-weight: 700; color: #fff; }";
 
@@ -192,7 +193,7 @@
       var word = st.targets[st.i];
       showWord("model");
       ctx.say("This is how you spell " + word + ".");
-      ctx.later(then, MODEL_MS);
+      ctx.afterCorrection(then, MODEL_MS);
     }
 
     function nextTrial() {
@@ -241,7 +242,8 @@
       ASD.std.session(),
       ASD.std.praise(),
       ASD.std.trials(10),
-      voice
+      voice,
+      ASD.std.pause()
     ],
     run: run
   });
